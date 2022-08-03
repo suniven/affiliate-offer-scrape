@@ -21,7 +21,7 @@ from comm.config import sqlconn
 # url_prefix = 'https://www.affplus.com/search?verticals=Adult&sort=time_desc&page='  # 后面加页数
 # url_prefix = 'https://www.affplus.com/search?verticals=Dating&sort=time_desc&page='  # 后面加页数
 url_prefix = 'https://www.affplus.com/search?page='
-START_PAGE = 1
+START_PAGE = 1   # 101-150结束  # 43  # 98    # 151-200结束
 END_PAGE = 200
 PAGE_COUNT = 200
 headers = {
@@ -117,6 +117,22 @@ def get_offer(offer_link, browser, session):
         print("Error: ", err)
 
     affpay_offer.land_page_img = ''
+    affpay_offer.land_page = ''
+    try:
+        browser.find_element_by_xpath(
+            '//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[2]/div[1]').click()
+
+        handles = browser.window_handles
+        browser.switch_to.window(handles[2])
+        if 'The Geek Gaming Smartlink' in affpay_offer.title:  # 先这样吧懒得管了
+            affpay_offer.land_page = 'about:blank'
+        else:
+            affpay_offer.land_page = browser.current_url
+
+        browser.close()
+        browser.switch_to.window(handles[1])
+    except Exception as err:
+        print("Getting Preview Landing Page Error: ", err)
 
     # description 麻烦死了
     affpay_offer.description = ''
@@ -166,6 +182,7 @@ if __name__ == '__main__':
     option.add_argument('--headless')
     option.add_argument("--window-size=1920,1080")
     browser = webdriver.Chrome(chrome_options=option)
+    browser.implicitly_wait(10)
     engine = create_engine(sqlconn, echo=True, max_overflow=8)
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
@@ -175,7 +192,6 @@ if __name__ == '__main__':
         print("Getting Page {0}...".format(i))
         url = url_prefix + str(i)
         browser.get(url)
-        time.sleep(3)
         main_handle = browser.current_window_handle
         offer_links = browser.find_elements_by_css_selector('h2.mb-1 a')
         for offer_link in offer_links:
@@ -193,7 +209,6 @@ if __name__ == '__main__':
             get_offer(link, browser, session)
             browser.close()
             browser.switch_to.window(main_handle)
-            time.sleep(0.5)
             # break  # for test
         # break  # for test
     browser.quit()
