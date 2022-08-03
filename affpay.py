@@ -18,11 +18,10 @@ from comm.model import Affpay_Offer
 from bs4 import BeautifulSoup
 from comm.config import sqlconn
 
-sqlconn = 'mysql+pymysql://root:1101syw@localhost:3306/test?charset=utf8mb4'
 # url_prefix = 'https://www.affplus.com/search?verticals=Adult&sort=time_desc&page='  # 后面加页数
 # url_prefix = 'https://www.affplus.com/search?verticals=Dating&sort=time_desc&page='  # 后面加页数
 url_prefix = 'https://www.affplus.com/search?page='
-START_PAGE = 1   # 101-150结束  # 43  # 98    # 151-200结束
+START_PAGE = 1
 END_PAGE = 200
 PAGE_COUNT = 200
 headers = {
@@ -118,66 +117,6 @@ def get_offer(offer_link, browser, session):
         print("Error: ", err)
 
     affpay_offer.land_page_img = ''
-    try:
-        img_src = browser.find_element_by_xpath(
-            '//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[2]/div[1]/img').get_attribute(
-            'src')
-        img_src = img_src.replace("https", "http")
-        img_path = './data/affpay/' + img_src.split('/')[-1]
-        affpay_offer.land_page_img = img_src.split('/')[-1]
-        if not os.path.exists(img_path):
-            print("Getting Img {0}...".format(img_src))
-            r = requests.get(img_src, headers=headers,
-                             timeout=8, verify=False, proxies=proxies)
-            with open(img_path, "wb") as f:
-                f.write(r.content)
-                print("Img Successfully Gotten.")
-        else:
-            print("Img Already Exists.")
-    except Exception as err:
-        print("Getting Preview Img Error: ", err)
-
-    affpay_offer.land_page = ''
-    try:
-        browser.find_element_by_xpath(
-            '//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[2]/div[1]').click()
-        time.sleep(2)
-        # # 弹窗处理    ? 没用 只要我返回得够快弹窗就追不上我？
-        # # https://www.datingleben.com/mlp9/ 有弹窗 title like '%Iluvo.de%' or title like '%Douwant.me%'
-        # if 'Iluvo.de' in affpay_offer.title:
-        #     print("*** Alert Processing... ***")
-        #     WebDriverWait(browser, 10, 0.5).until(EC.alert_is_present())  # 最大等待时间10s 每0.5s检测一次元素 检测到即可进行下一步操作
-        #     alert = browser.switch_to.alert
-        #     print("Alter Info: ", alert.text)
-        #     alert.accept()  # 点击弹出框的确定按钮
-
-        handles = browser.window_handles
-        browser.switch_to.window(handles[2])
-        if 'The Geek Gaming Smartlink' in affpay_offer.title:  # 先这样吧懒得管了
-            affpay_offer.land_page = 'about:blank'
-        else:
-            affpay_offer.land_page = browser.current_url
-        # 网站截图比预览图更清楚一点
-        # TODO: No Img 名称先不考虑了
-        if browser.title:
-            # print("broswer.title:", browser.title)
-            try:
-                screenshot = '.\\data\\affpay\\screenshots\\' + \
-                    affpay_offer.land_page_img.replace(".jpg", "") + '.png'
-                if not os.path.exists(screenshot):
-                    browser.save_screenshot(screenshot)
-                    print("Take Screenshot successfully.")
-                else:
-                    print("Screenshot Already Exists.")
-
-            except BaseException as err_msg:
-                print("Failed To Take Screenshots：%s" % err_msg)
-        # print("broswer.title:", browser.title)
-        browser.close()
-        browser.switch_to.window(handles[1])
-        time.sleep(0.5)
-    except Exception as err:
-        print("Getting Preview Landing Page Error: ", err)
 
     # description 麻烦死了
     affpay_offer.description = ''
