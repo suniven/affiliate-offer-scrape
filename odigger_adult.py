@@ -22,13 +22,11 @@ url_prefix = 'https://odigger.com/offers?search=adult&page='
 PAGE_COUNT = 250
 MAX_REFRESH_TIME = 20
 headers = {
-    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'
+    'user-agent':
+    'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'
 }
 proxy = '127.0.0.1:1080'
-proxies = {
-    'http': 'http://' + proxy,
-    'https': 'http://' + proxy
-}
+proxies = {'http': 'http://' + proxy, 'https': 'http://' + proxy}
 
 
 def check_if_exist(browser, element, condition):
@@ -78,8 +76,7 @@ def get_offer(browser, offer_link, session):
                 odigger_offer.title = td_2.text
             elif td_1.text == 'Preview:':
                 if td_2.find_element_by_tag_name('a').get_attribute('href'):
-                    odigger_offer.land_page = td_2.find_element_by_tag_name(
-                        'a').get_attribute('href')
+                    odigger_offer.land_page = td_2.find_element_by_tag_name('a').get_attribute('href')
             elif td_1.text == 'Categories:':
                 odigger_offer.category = td_2.text
             elif td_1.text == 'Network:':
@@ -97,8 +94,7 @@ def get_offer(browser, offer_link, session):
                     # 要展开的
                     geo_list = []
                     td_2.find_element_by_css_selector('span > a').click()
-                    country_popovr = td_2.find_element_by_css_selector(
-                        'div.country-popovr')
+                    country_popovr = td_2.find_element_by_css_selector('div.country-popovr')
                     geos = country_popovr.find_elements_by_tag_name('a')
                     for geo in geos:
                         geo_list.append(geo.text)
@@ -107,8 +103,7 @@ def get_offer(browser, offer_link, session):
                     odigger_offer.geo = ' '.join(geo_list)
                 except:
                     # 不需要展开的
-                    odigger_offer.geo = td_2.find_element_by_css_selector(
-                        'span').text
+                    odigger_offer.geo = td_2.find_element_by_css_selector('span').text
     except Exception as err:
         print("** Get Basic Info Err. **")
         print(err)
@@ -119,59 +114,6 @@ def get_offer(browser, offer_link, session):
     except Exception as err:
         print("** Get Description Error **")
         print(err)
-
-    # Preview Landing Page Img
-    try:
-        img_src = browser.find_element_by_xpath(
-            '//*[@id="app"]/section/div/div/div[2]/div/div[1]/div[2]/div[2]/div[1]/ul/li[1]/img').get_attribute(
-            'src')
-        img_src = img_src.replace("https", "http")
-        img_path = './data/odigger/' + img_src.split('/')[-2] + '.jpg'
-        odigger_offer.land_page_img = img_src.split('/')[-2] + '.jpg'
-        if not os.path.exists(img_path):
-            print("--Getting Img {0} --".format(img_src))
-            r = requests.get(img_src, headers=headers,
-                             timeout=8, proxies=proxies)
-            with open(img_path, "wb") as f:
-                f.write(r.content)
-                print("--Successfully Got Img.--")
-        else:
-            print("--Img Already Exists.--")
-
-    except Exception as err:
-        print("** Getting Preview Img Error **")
-        print(err)
-
-    # Landing Page
-    if odigger_offer.land_page:
-        try:
-            js = 'window.open(\"' + odigger_offer.land_page + '\");'
-            browser.execute_script(js)
-            time.sleep(1)
-            handles = browser.window_handles
-            browser.switch_to.window(handles[2])  # 切换标签页
-            time.sleep(2)
-            if browser.title:
-                # 截图
-                try:
-                    screenshot = '.\\data\\odigger\\screenshots\\' + odigger_offer.land_page_img.replace(".jpg",
-                                                                                                         "") + '.png'
-                    if not os.path.exists(screenshot):
-                        browser.save_screenshot(screenshot)
-                        print("--Take Screenshot successfully.--")
-                    else:
-                        print("--Screenshot Already Exists.--")
-
-                except Exception as err:
-                    print("** Failed To Take Screenshots. **")
-                    print(err)
-
-            browser.close()
-            browser.switch_to.window(handles[1])
-            time.sleep(1)
-        except Exception as err:
-            print("Get Landing Page Error.")
-            print(err)
 
     print("offer title: ", odigger_offer.title)
     print("offer landing page: ", odigger_offer.land_page)
@@ -194,14 +136,14 @@ def get_offer(browser, offer_link, session):
 if __name__ == '__main__':
     start_page = int(input('Start Page: '))
     end_page = int(input('End Page: '))
-    # 正常模式
-    browser = webdriver.Chrome()
-    browser.maximize_window()
+    # # 正常模式
+    # browser = webdriver.Chrome()
+    # browser.maximize_window()
     # headless模式
-    # option = webdriver.ChromeOptions()
-    # option.add_argument('--headless')
-    # option.add_argument("--window-size=1920,1080")
-    # browser = webdriver.Chrome(chrome_options=option)
+    option = webdriver.ChromeOptions()
+    option.add_argument('--headless')
+    option.add_argument("--window-size=1920,1080")
+    browser = webdriver.Chrome(chrome_options=option)
     engine = create_engine(sqlconn, echo=True, max_overflow=8)
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
@@ -221,17 +163,13 @@ if __name__ == '__main__':
                 browser.refresh()
                 time.sleep(4)
                 refresh_time = refresh_time - 1
-            trs = browser.find_elements_by_css_selector(
-                '#search-page-offers-table > tbody > tr')
+            trs = browser.find_elements_by_css_selector('#search-page-offers-table > tbody > tr')
             main_handle = browser.current_window_handle
             for tr in trs:
-                offer_link = tr.find_element_by_css_selector(
-                    'h6 > a').get_attribute('href')
-                rows = session.query(Odigger_Offer).filter(
-                    Odigger_Offer.url.like(offer_link)).all()
+                offer_link = tr.find_element_by_css_selector('h6 > a').get_attribute('href')
+                rows = session.query(Odigger_Offer).filter(Odigger_Offer.url.like(offer_link)).all()
                 if rows:
-                    print(
-                        "---Offer {0} Has Already Been Visited---".format(offer_link))
+                    print("---Offer {0} Has Already Been Visited---".format(offer_link))
                     continue
 
                 print("--- Getting Offer {0} ---".format(offer_link))
