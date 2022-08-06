@@ -164,7 +164,7 @@ if __name__ == '__main__':
     option.add_argument('--headless')
     option.add_argument("--window-size=1920,1080")
     browser = webdriver.Chrome(chrome_options=option)
-    engine = create_engine(sqlconn, echo=True, max_overflow=8)
+    engine = create_engine(sqlconn, echo=True, max_overflow=16)
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     selected_index = sys.argv[1]
