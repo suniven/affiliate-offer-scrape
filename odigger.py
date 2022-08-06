@@ -21,10 +21,7 @@ from comm.config import sqlconn
 url_prefix = 'https://odigger.com/offers?search=&page='
 PAGE_COUNT = 250
 MAX_REFRESH_TIME = 20
-headers = {
-    'user-agent':
-    'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'
-}
+headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'}
 proxy = '127.0.0.1:1080'
 proxies = {'http': 'http://' + proxy, 'https': 'http://' + proxy}
 
@@ -66,8 +63,7 @@ def get_offer(browser, offer_link, session):
     odigger_offer.status = ''
 
     try:
-        tbody = browser.find_element_by_xpath(
-            '//*[@id="app"]/section/div/div/div[2]/div/div[1]/div[2]/div[2]/div[2]/div/div/table/tbody')
+        tbody = browser.find_element_by_xpath('//*[@id="app"]/section/div/div/div[2]/div/div[1]/div[2]/div[2]/div[2]/div/div/table/tbody')
         trs = tbody.find_elements_by_tag_name('tr')
         for tr in trs:
             td_1 = tr.find_elements_by_tag_name('td')[0]
@@ -109,8 +105,7 @@ def get_offer(browser, offer_link, session):
         print(err)
 
     try:
-        odigger_offer.description = browser.find_element_by_xpath(
-            '//*[@id="app"]/section/div/div/div[2]/div/div[1]/div[4]/div[1]/div/div/div').text
+        odigger_offer.description = browser.find_element_by_xpath('//*[@id="app"]/section/div/div/div[2]/div/div[1]/div[4]/div[1]/div/div/div').text
     except Exception as err:
         print("** Get Description Error **")
         print(err)
@@ -134,8 +129,10 @@ def get_offer(browser, offer_link, session):
 
 
 if __name__ == '__main__':
-    start_page = int(input('Start Page: '))
-    end_page = int(input('End Page: '))
+    # start_page = int(input('Start Page: '))
+    # end_page = int(input('End Page: '))
+    start_page = 1
+    end_page = 250
     # # 正常模式
     # browser = webdriver.Chrome()
     # browser.maximize_window()

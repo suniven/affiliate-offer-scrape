@@ -1,8 +1,6 @@
-import os
 import re
+import sys
 import time
-import lxml
-import requests
 from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.support import expected_conditions as EC
@@ -15,20 +13,13 @@ from sqlalchemy.dialects import mysql
 from sqlalchemy.sql import and_, asc, desc, or_
 from comm.timestamp import get_now_timestamp
 from comm.model import Offervault_Offer
-from bs4 import BeautifulSoup
 from comm.config import sqlconn
-
 
 url = 'https://offervault.com/?selectedTab=topOffers&search=&page=1'
 PAGE_COUNT = 250
-headers = {
-    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'
-}
+headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'}
 proxy = '127.0.0.1:1080'
-proxies = {
-    'http': 'http://' + proxy,
-    'https': 'http://' + proxy
-}
+proxies = {'http': 'http://' + proxy, 'https': 'http://' + proxy}
 
 
 def check_if_exist(browser, element, condition):
@@ -69,8 +60,7 @@ def get_offer(browser, session, offer_link):
     # 本来就没有
     offervault_offer.offer_create_time = ''
     try:
-        tbody = browser.find_element_by_xpath(
-            '//*[@id="__layout"]/div/section/div/div/div/div/div[1]/div[1]/div[2]/div[1]/div/div/table/tbody')
+        tbody = browser.find_element_by_xpath('//*[@id="__layout"]/div/section/div/div/div/div/div[1]/div[1]/div[2]/div[1]/div/div/table/tbody')
         # 防止像affpay一样有的项没有
         items = tbody.find_elements_by_tag_name('tr')
         for item in items:
@@ -93,8 +83,7 @@ def get_offer(browser, session, offer_link):
                     a = td.find_element_by_tag_name('a').click()
                     # ul = browser.find_element_by_xpath('//*[@id="__bv_popover_116__"]/div[2]/div/ul')
                     # 太狗了 id 是动态变化的 要自己写xpath
-                    ul = browser.find_element_by_css_selector(
-                        'div.popover > div.popover-body > div.country-popovr > ul')
+                    ul = browser.find_element_by_css_selector('div.popover > div.popover-body > div.country-popovr > ul')
                     countries = ul.find_elements_by_tag_name('a')
                     geos = []
                     for country in countries:
@@ -113,9 +102,7 @@ def get_offer(browser, session, offer_link):
                     offervault_offer.geo = ' '.join(geos)
             elif th == 'Preview:':
                 try:
-                    preview_url = td.find_element_by_tag_name(
-                        'a').get_attribute('href')
-                    # Landing Page
+                    preview_url = td.find_element_by_tag_name('a').get_attribute('href')
                     if preview_url:
                         offervault_offer.land_page = preview_url
                 except Exception as err:
@@ -126,8 +113,7 @@ def get_offer(browser, session, offer_link):
         print(err)
 
     try:
-        offervault_offer.description = browser.find_element_by_xpath(
-            '//*[@id="__layout"]/div/section/div/div/div/div/div[1]/div[1]/div[2]/div[3]/div').text
+        offervault_offer.description = browser.find_element_by_xpath('//*[@id="__layout"]/div/section/div/div/div/div/div[1]/div[1]/div[2]/div[3]/div').text
     except Exception as err:
         print("No Description.")
         print(err)
@@ -151,8 +137,7 @@ def get_next_page(browser, retry):
     try:  # 可能出错 stale element reference: element is not attached to the page document
         if retry == 10:
             return
-        next_page = browser.find_element_by_xpath(
-            '//*[@id="__layout"]/div/section[2]/div/div/div/div[1]/div[1]/div/div/div[2]/ul/li[10]/button')
+        next_page = browser.find_element_by_xpath('//*[@id="__layout"]/div/section[2]/div/div/div/div[1]/div[1]/div/div/div[2]/ul/li[10]/button')
         next_page.click()
         time.sleep(4)
         retry = 0
@@ -175,19 +160,16 @@ if __name__ == '__main__':
     engine = create_engine(sqlconn, echo=True, max_overflow=8)
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
-
+    selected_index = sys.argv[1]
+    tag_xpath = '//*[@id="__layout"]/div/section[1]/div[1]/div/div[1]/div[1]/div/div[1]/ul/li[3]/div/div[3]/ul/li[' + selected_index + ']'
     try:
-        # 选择adult分类
-        browser.get(url)  
+        # 选择分类
+        browser.get(url)
         browser.implicitly_wait(3)
-        multi_select = browser.find_element_by_xpath(
-            '//*[@id="__layout"]/div/section[1]/div[1]/div/div[1]/div[1]/div/div[1]/ul/li[3]/div/div[1]')
-        ActionChains(browser).move_to_element(
-            multi_select).click().perform()  # **必须要模拟鼠标悬浮否则没反应
-        adult_tag = browser.find_element_by_xpath(
-            '//*[@id="__layout"]/div/section[1]/div[1]/div/div[1]/div[1]/div/div[1]/ul/li[3]/div/div[3]/ul/li[3]')
-        ActionChains(browser).move_to_element(adult_tag).click().perform()
-        time.sleep(3)
+        multi_select = browser.find_element_by_xpath('//*[@id="__layout"]/div/section[1]/div[1]/div/div[1]/div[1]/div/div[1]/ul/li[3]/div/div[1]')
+        ActionChains(browser).move_to_element(multi_select).click().perform()  # **必须要模拟鼠标悬浮否则没反应
+        browser.find_element_by_xpath(tag_xpath).click()
+        time.sleep(2)
 
         while True:
             main_handle = browser.current_window_handle
@@ -195,8 +177,7 @@ if __name__ == '__main__':
             page = re.findall(r'page=[0-9]+', url)[0][5:]
             print("-------Current Page: {0}-------".format(page))
             # 获取当前页offer链接
-            container = browser.find_element_by_css_selector(
-                '#index-page-offerstable > tbody')
+            container = browser.find_element_by_css_selector('#index-page-offerstable > tbody')
             links = container.find_elements_by_tag_name('a')
             for link in links:
                 offer_link = link.get_attribute('href')
@@ -204,25 +185,21 @@ if __name__ == '__main__':
                 if offer_link == 'javascript:;':
                     continue
                 # 检查是否已经爬取过这个offer了
-                rows = session.query(Offervault_Offer).filter(
-                    Offervault_Offer.url.like(offer_link)).all()
+                rows = session.query(Offervault_Offer).filter(Offervault_Offer.url.like(offer_link)).all()
                 if rows:
-                    print(
-                        "*** Offer {0} Has Already Been Visited. ***".format(offer_link))
+                    print("*** Offer {0} Has Already Been Visited. ***".format(offer_link))
                     continue
                 # # 折叠countries测试
                 # offer_link = 'https://offervault.com/offer/b2cdfbacede6f41df8017045d803b1df/badoink-vod-nz-au-ca-gb-us'
                 get_offer(browser, session, offer_link)
                 browser.close()
                 browser.switch_to.window(main_handle)
-                time.sleep(2)
+                time.sleep(1)
             #     break  # for test
             # break  # for test
 
             # 判断是否还有下一页
-            if not check_if_exist(browser,
-                                  '//*[@id="__layout"]/div/section[2]/div/div/div/div[1]/div[1]/div/div/div[2]/ul/li[10]/button',
-                                  'xpath'):
+            if not check_if_exist(browser, '//*[@id="__layout"]/div/section[2]/div/div/div/div[1]/div[1]/div/div/div[2]/ul/li[10]/button', 'xpath'):
                 break
             else:
                 # 跳转到下一页
@@ -231,6 +208,5 @@ if __name__ == '__main__':
     except Exception as err:
         print(err)
 
-    finally:
-        browser.quit()
-        session.close()
+    browser.quit()
+    session.close()

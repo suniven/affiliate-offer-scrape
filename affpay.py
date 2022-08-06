@@ -21,17 +21,12 @@ from comm.config import sqlconn
 # url_prefix = 'https://www.affplus.com/search?verticals=Adult&sort=time_desc&page='  # 后面加页数
 # url_prefix = 'https://www.affplus.com/search?verticals=Dating&sort=time_desc&page='  # 后面加页数
 url_prefix = 'https://www.affplus.com/search?page='
-START_PAGE = 1   # 101-150结束  # 43  # 98    # 151-200结束
+START_PAGE = 1  # 101-150结束  # 43  # 98    # 151-200结束
 END_PAGE = 200
 PAGE_COUNT = 200
-headers = {
-    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'
-}
+headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'}
 proxy = '127.0.0.1:1080'
-proxies = {
-    'http': 'http://' + proxy,
-    'https': 'http://' + proxy
-}
+proxies = {'http': 'http://' + proxy, 'https': 'http://' + proxy}
 
 
 def check_if_exist(browser, element, condition):
@@ -62,11 +57,9 @@ def get_offer(offer_link, browser, session):
     affpay_offer.offer_create_time = ''
     affpay_offer.offer_update_time = ''
     try:
-        affpay_offer.title = browser.find_element_by_css_selector(
-            'h1.richtext').text
+        affpay_offer.title = browser.find_element_by_css_selector('h1.richtext').text
         # print("title: ", affpay_offer.title)
-        container = browser.find_element_by_xpath(
-            '//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[1]/div')
+        container = browser.find_element_by_xpath('//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[1]/div')
         spans = container.find_elements_by_tag_name('span')
         affpay_offer.status = spans[0].text
         # print("status: ", affpay_offer.status)
@@ -78,15 +71,13 @@ def get_offer(offer_link, browser, session):
         print("Error: ", err)
 
     try:
-        affpay_offer.network = browser.find_element_by_xpath(
-            '//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div[1]/h3').text
+        affpay_offer.network = browser.find_element_by_xpath('//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div[1]/h3').text
         # print("network: ", affpay_offer.network)
 
         affpay_offer.payout = ''
         affpay_offer.category = ''
         affpay_offer.geo = ''
-        divs = browser.find_elements_by_xpath(
-            '//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[2]/div[2]/div')
+        divs = browser.find_elements_by_xpath('//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[2]/div[2]/div')
         for div in divs:
             spans = div.find_elements_by_tag_name('span')
             if spans[0].text == 'PAYOUT':
@@ -119,8 +110,7 @@ def get_offer(offer_link, browser, session):
     affpay_offer.land_page_img = ''
     affpay_offer.land_page = ''
     try:
-        browser.find_element_by_xpath(
-            '//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[2]/div[1]').click()
+        browser.find_element_by_xpath('//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[2]/div[1]').click()
 
         handles = browser.window_handles
         browser.switch_to.window(handles[2])
@@ -137,17 +127,14 @@ def get_offer(offer_link, browser, session):
     # description 麻烦死了
     affpay_offer.description = ''
     try:
-        show_more_btn = browser.find_element_by_xpath(
-            '//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[3]/div/div/span')
+        show_more_btn = browser.find_element_by_xpath('//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[3]/div/div/span')
         show_more_btn.click()
     except Exception as err:
         print("No Show More Btn.")
         # print("Error Detail: ", err)
     try:
         # 情况太多，直接处理html算了
-        description = browser.find_element_by_xpath(
-            '//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[3]/div').get_attribute(
-            'innerHTML')
+        description = browser.find_element_by_xpath('//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[3]/div').get_attribute('innerHTML')
         soup = BeautifulSoup(description, "lxml")
         description = soup.get_text()
         affpay_offer.description = description
@@ -197,8 +184,7 @@ if __name__ == '__main__':
         for offer_link in offer_links:
             link = offer_link.get_attribute('href')
             # 检查是否已经爬取过这个offer了
-            rows = session.query(Affpay_Offer).filter(
-                Affpay_Offer.url.like(link)).all()
+            rows = session.query(Affpay_Offer).filter(Affpay_Offer.url.like(link)).all()
             if rows:
                 print("Offer {0} Has Already Been Visited.".format(link))
                 continue

@@ -45,7 +45,7 @@ def check_if_exist(browser, element, condition):
 
 
 def get_offer(browser, session, offer_link):
-    print("---Visiting Offer: {0}...".format(offer_link))
+    print("---Visiting Offer: {0}".format(offer_link))
     js = 'window.open(\"' + offer_link + '\");'
     browser.execute_script(js)
     time.sleep(2)
