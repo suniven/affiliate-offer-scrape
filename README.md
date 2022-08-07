@@ -8,3 +8,8 @@ Scrape affiliate offers from Odigger, Offervault and Affplus.
 `python offervault_v2.py [argv]`
 
 argv: [1,69] 整数
+
+## affpay.py
+`python affpay.py [argv]`
+
+argv: [0,76] 整数

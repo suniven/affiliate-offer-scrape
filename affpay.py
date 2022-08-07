@@ -1,8 +1,6 @@
-import os
 import re
+import sys
 import time
-import lxml
-import requests
 from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.support import expected_conditions as EC
@@ -18,10 +16,20 @@ from comm.model import Affpay_Offer
 from bs4 import BeautifulSoup
 from comm.config import sqlconn
 
+# 共77种category
+category_list = [
+    "Mobile", "CPL", "SOI", "Sweepstake", "Incent", "Android", "Dating", "Nutra", "Crypto", "Ecommerce", "iOS", "CPS", "BizOpp", "Shopping", "Forex",
+    "Health", "Game", "CPI", "Adult", "Finance", "Entertainment", "Pin", "Gambling", "App", "Email", "DOI", "Download", "Casino", "Survey", "Job",
+    "Subscription", "COD", "Desktop", "CPE", "Diet", "RevShare", "Freebie", "Software", "Beauty", "Insurance", "Coupon", "Leadgen", "Utility",
+    "Trial", "Mainstream", "PPS", "Home", "CPR", "Service", "Auto", "VOD", "Fitness", "PPL", "Betting", "Sport", "Travel", "LifeStyle", "Business",
+    "Install", "Smartlink", "Loan", "Credit", "Education", "Cam", "Solar", "CPC", "CBD", "Streaming", "Binary", "Payday", "Real Estate",
+    "Pay Per Call", "Astrology", "Music", "Legal", "KPI", "Auctions"
+]
+
 # url_prefix = 'https://www.affplus.com/search?verticals=Adult&sort=time_desc&page='  # 后面加页数
 # url_prefix = 'https://www.affplus.com/search?verticals=Dating&sort=time_desc&page='  # 后面加页数
-url_prefix = 'https://www.affplus.com/search?page='
-START_PAGE = 1  # 101-150结束  # 43  # 98    # 151-200结束
+
+START_PAGE = 1
 END_PAGE = 200
 PAGE_COUNT = 200
 headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'}
@@ -71,7 +79,8 @@ def get_offer(offer_link, browser, session):
         print("Error: ", err)
 
     try:
-        affpay_offer.network = browser.find_element_by_xpath('//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div[1]/h3').text
+        affpay_offer.network = browser.find_element_by_xpath(
+            '//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[1]/div[2]/div[1]/div/div[1]/h3').text
         # print("network: ", affpay_offer.network)
 
         affpay_offer.payout = ''
@@ -127,14 +136,16 @@ def get_offer(offer_link, browser, session):
     # description 麻烦死了
     affpay_offer.description = ''
     try:
-        show_more_btn = browser.find_element_by_xpath('//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[3]/div/div/span')
+        show_more_btn = browser.find_element_by_xpath(
+            '//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[3]/div/div/span')
         show_more_btn.click()
     except Exception as err:
         print("No Show More Btn.")
         # print("Error Detail: ", err)
     try:
         # 情况太多，直接处理html算了
-        description = browser.find_element_by_xpath('//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[3]/div').get_attribute('innerHTML')
+        description = browser.find_element_by_xpath(
+            '//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[3]/div').get_attribute('innerHTML')
         soup = BeautifulSoup(description, "lxml")
         description = soup.get_text()
         affpay_offer.description = description
@@ -173,6 +184,9 @@ if __name__ == '__main__':
     engine = create_engine(sqlconn, echo=True, max_overflow=8)
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
+
+    category = category_list[int(sys.argv[1])]
+    url_prefix = 'https://www.affplus.com/search?verticals=' + category + '&page='
 
     for i in range(START_PAGE, END_PAGE + 1):
         print("--------------------")
