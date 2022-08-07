@@ -17,10 +17,7 @@ from comm.config import sqlconn
 
 url = 'https://offervault.com/?selectedTab=topOffers&search=&page=1'
 PAGE_COUNT = 250
-headers = {
-    'user-agent':
-    'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'
-}
+headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'}
 proxy = '127.0.0.1:1080'
 proxies = {'http': 'http://' + proxy, 'https': 'http://' + proxy}
 
@@ -63,8 +60,7 @@ def get_offer(browser, session, offer_link):
     # 本来就没有
     offervault_offer.offer_create_time = ''
     try:
-        tbody = browser.find_element_by_xpath(
-            '//*[@id="__layout"]/div/section/div/div/div/div/div[1]/div[1]/div[2]/div[1]/div/div/table/tbody')
+        tbody = browser.find_element_by_xpath('//*[@id="__layout"]/div/section/div/div/div/div/div[1]/div[1]/div[2]/div[1]/div/div/table/tbody')
         # 防止像affpay一样有的项没有
         items = tbody.find_elements_by_tag_name('tr')
         for item in items:
@@ -87,8 +83,7 @@ def get_offer(browser, session, offer_link):
                     a = td.find_element_by_tag_name('a').click()
                     # ul = browser.find_element_by_xpath('//*[@id="__bv_popover_116__"]/div[2]/div/ul')
                     # 太狗了 id 是动态变化的 要自己写xpath
-                    ul = browser.find_element_by_css_selector(
-                        'div.popover > div.popover-body > div.country-popovr > ul')
+                    ul = browser.find_element_by_css_selector('div.popover > div.popover-body > div.country-popovr > ul')
                     countries = ul.find_elements_by_tag_name('a')
                     geos = []
                     for country in countries:
@@ -139,20 +134,19 @@ def get_offer(browser, session, offer_link):
     session.commit()
 
 
-def get_next_page(browser, retry):
+def get_next_page(browser, retry, next_page_xpath):
     try:  # 可能出错 stale element reference: element is not attached to the page document
         if retry == 10:
             return
-        next_page = browser.find_element_by_xpath(
-            '//*[@id="__layout"]/div/section[2]/div/div/div/div[1]/div[1]/div/div/div[2]/ul/li[10]/button')
+        next_page = browser.find_element_by_xpath(next_page_xpath)
         next_page.click()
-        time.sleep(4)
+        time.sleep(3)
         retry = 0
         return
     except:
         retry = retry + 1
         print("Try Again.")
-        get_next_page(browser, retry)
+        get_next_page(browser, retry, next_page_xpath)
 
 
 if __name__ == '__main__':
@@ -173,8 +167,7 @@ if __name__ == '__main__':
         # 选择分类
         browser.get(url)
         browser.implicitly_wait(3)
-        multi_select = browser.find_element_by_xpath(
-            '//*[@id="__layout"]/div/section[1]/div[1]/div/div[1]/div[1]/div/div[1]/ul/li[3]/div/div[1]')
+        multi_select = browser.find_element_by_xpath('//*[@id="__layout"]/div/section[1]/div[1]/div/div[1]/div[1]/div/div[1]/ul/li[3]/div/div[1]')
         ActionChains(browser).move_to_element(multi_select).click().perform()  # **必须要模拟鼠标悬浮否则没反应
         browser.find_element_by_xpath(tag_xpath).click()
         time.sleep(2)
@@ -207,14 +200,16 @@ if __name__ == '__main__':
             # break  # for test
 
             # 判断是否还有下一页
-            if not check_if_exist(
-                    browser,
-                    '//*[@id="__layout"]/div/section[2]/div/div/div/div[1]/div[1]/div/div/div[2]/ul/li[10]/button',
-                    'xpath'):
+            btn_count = len(
+                browser.find_elements_by_css_selector(
+                    '#__layout > div > section:nth-child(3) > div > div > div > div.col-md-9 > div.tablecont > div > div > div.paginrow > ul > li'))
+            next_page_index = btn_count - 1
+            next_page_xpath = '//*[@id="__layout"]/div/section[2]/div/div/div/div[1]/div[1]/div/div/div[2]/ul/li[' + str(next_page_index) + ']/button'
+            if not check_if_exist(browser, next_page_xpath, 'xpath'):
                 break
             else:
                 # 跳转到下一页
-                get_next_page(browser, 0)
+                get_next_page(browser, 0, next_page_xpath)
 
     except Exception as err:
         print(err)
