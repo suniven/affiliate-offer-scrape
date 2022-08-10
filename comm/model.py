@@ -18,7 +18,7 @@ class Affpay_Offer(Base):
     status = Column(String(24))
     offer_create_time = Column(String(32))
     offer_update_time = Column(String(32))
-    category = Column(String(256))
+    category = Column(String(1000))
     geo = Column(String(2048))
     network = Column(String(100))
     description = Column(Text)

@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `affpay_offer`
     `status`            varchar(24)               NOT NULL DEFAULT '' COMMENT 'offer状态',
     `offer_create_time` varchar(32)               NOT NULL DEFAULT 0 COMMENT 'offer创建时间',
     `offer_update_time` varchar(32)               NOT NULL DEFAULT '' COMMENT 'offer更新时间',
-    `category`          varchar(256)              NOT NULL DEFAULT '' COMMENT 'offer类别',
+    `category`          varchar(1000)              NOT NULL DEFAULT '' COMMENT 'offer类别',
     `geo`               VARCHAR(2048)             NOT NULL DEFAULT '' COMMENT '国家地区',
     `network`           VARCHAR(100)               NOT NULL DEFAULT '' COMMENT '营销网络',
     `description`       mediumtext            NOT NULL DEFAULT '' COMMENT 'offer描述',
