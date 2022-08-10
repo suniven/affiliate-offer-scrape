@@ -21,7 +21,7 @@ class Affpay_Offer(Base):
     category = Column(String(256))
     geo = Column(String(2048))
     network = Column(String(100))
-    description = Column(String(10000))
+    description = Column(Text)
     land_page = Column(String(1024))
     land_page_img = Column(String(256))
     create_time = Column(mysql.BIGINT)
