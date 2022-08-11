@@ -225,11 +225,11 @@ def main():
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
 
-    # offervault:
+    # # offervault:
     # offervault(browser, session)
-    # odigger:
+    # # odigger:
     # odigger(browser, session)
-    # affpay
+    # affpay 爬完了
     affpay(browser, session)
 
     browser.close()
