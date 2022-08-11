@@ -18,19 +18,13 @@ from comm.config import sqlconn
 
 
 def offervault(browser, session):
+    total_page = 17
     url_prefix = 'https://offervault.com/networks/?search=&page='
-    page = 1
-    url = url_prefix + str(page)
-    while True:
+    for page in range(1, total_page + 1):
         try:
-            page += 1
-            browser.get(url)
-            cur_page = re.findall(r'page=[0-9]+', browser.current_url)[0][5:]
-            if cur_page == page:
-                break
             url = url_prefix + str(page)
-
-            print("---Current Page: {0} ---".format(cur_page))
+            browser.get(url)
+            print("---Current Page: {0} ---".format(page))
             main_handle = browser.current_window_handle
             # no.1
             table = browser.find_element_by_css_selector('#offertable > tbody')
@@ -47,7 +41,8 @@ def offervault(browser, session):
                 ).text.split(' - ')[-1]
 
                 # 看之前是否已经爬取过
-                rows = session.query(Affiliate_Network).filter(Affiliate_Network.name.like(affiliate_network_name)).all()
+                rows = session.query(Affiliate_Network).filter(
+                    Affiliate_Network.name.like(affiliate_network_name)).all()
                 if rows:
                     print("已经爬取过")
                     continue
@@ -89,7 +84,8 @@ def offervault(browser, session):
                 ).text.split(' - ')[-1]
 
                 # 看之前是否已经爬取过
-                rows = session.query(Affiliate_Network).filter(Affiliate_Network.name.like(affiliate_network_name)).all()
+                rows = session.query(Affiliate_Network).filter(
+                    Affiliate_Network.name.like(affiliate_network_name)).all()
                 if rows:
                     print("已经爬取过")
                     continue
@@ -118,7 +114,7 @@ def offervault(browser, session):
                 browser.switch_to.window(main_handle)
         except Exception as err:
             print("Error: ", err)
-            return
+            continue
 
 
 def odigger(browser, session):
@@ -126,15 +122,18 @@ def odigger(browser, session):
         total_page = 25  # 先写死吧
         for page in range(1, total_page + 1):
             url = 'https://odigger.com/networks?page=' + str(page) + '&search='
+            print(url)
             browser.get(url)
+            print("Page: ", page)
             main_handle = browser.current_window_handle
-            trs = browser.find_elements_by_css_selector('table#total_page > tbody >tr')
+            trs = browser.find_elements_by_css_selector('table#networks-table> tbody > tr')
             for tr in trs:
-                tds = tr.find_elements_by_tag('td')
+                tds = tr.find_elements_by_tag_name('td')
                 affiliate_network_name = tds[2].find_element_by_tag_name('a').text
-
+                print("affiliate_network_name: ", affiliate_network_name)
                 # 看之前是否已经爬取过
-                rows = session.query(Affiliate_Network).filter(Affiliate_Network.name.like(affiliate_network_name)).all()
+                rows = session.query(Affiliate_Network).filter(
+                    Affiliate_Network.name.like(affiliate_network_name)).all()
                 if rows:
                     print("已经爬取过")
                     continue
@@ -181,7 +180,8 @@ def affpay(browser, session):
             for item in items:
                 affiliate_network_name = item.find_element_by_tag_name('h2').text
                 # 看之前是否已经爬取过
-                rows = session.query(Affiliate_Network).filter(Affiliate_Network.name.like(affiliate_network_name)).all()
+                rows = session.query(Affiliate_Network).filter(
+                    Affiliate_Network.name.like(affiliate_network_name)).all()
                 if rows:
                     print("已经爬取过")
                     continue
@@ -212,23 +212,23 @@ def affpay(browser, session):
 
 
 def main():
-    # # 正常模式
-    # browser = webdriver.Chrome()
-    # browser.maximize_window()
-    # headless模式
-    option = webdriver.ChromeOptions()
-    option.add_argument('--headless')
-    option.add_argument("--window-size=1920,1080")
-    browser = webdriver.Chrome(chrome_options=option)
+    # 正常模式
+    browser = webdriver.Chrome()
+    browser.maximize_window()
+    # # headless模式
+    # option = webdriver.ChromeOptions()
+    # option.add_argument('--headless')
+    # option.add_argument("--window-size=1920,1080")
+    # browser = webdriver.Chrome(chrome_options=option)
     browser.implicitly_wait(15)
     engine = create_engine(sqlconn, echo=True, max_overflow=16)
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
 
     # offervault:
-    offervault(browser, session)
+    # offervault(browser, session)
     # odigger:
-    odigger(browser, session)
+    # odigger(browser, session)
     # affpay
     affpay(browser, session)
 

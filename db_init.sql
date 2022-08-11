@@ -7,10 +7,10 @@ CREATE TABLE IF NOT EXISTS `affpay_offer`
     `status`            varchar(24)               NOT NULL DEFAULT '' COMMENT 'offer状态',
     `offer_create_time` varchar(32)               NOT NULL DEFAULT 0 COMMENT 'offer创建时间',
     `offer_update_time` varchar(32)               NOT NULL DEFAULT '' COMMENT 'offer更新时间',
-    `category`          varchar(1000)              NOT NULL DEFAULT '' COMMENT 'offer类别',
+    `category`          varchar(1000)             NOT NULL DEFAULT '' COMMENT 'offer类别',
     `geo`               VARCHAR(2048)             NOT NULL DEFAULT '' COMMENT '国家地区',
-    `network`           VARCHAR(100)               NOT NULL DEFAULT '' COMMENT '营销网络',
-    `description`       mediumtext            NOT NULL DEFAULT '' COMMENT 'offer描述',
+    `network`           VARCHAR(100)              NOT NULL DEFAULT '' COMMENT '营销网络',
+    `description`       mediumtext                NOT NULL DEFAULT '' COMMENT 'offer描述',
     `land_page`         VARCHAR(1024)             NOT NULL DEFAULT '' COMMENT '落地页链接',
     `land_page_img`     VARCHAR(256)              NOT NULL DEFAULT '' COMMENT '落地页图片',
     `create_time`       bigint(20)                NOT NULL DEFAULT 0 COMMENT '数据创建时间',
@@ -25,13 +25,13 @@ CREATE TABLE IF NOT EXISTS `offervault_offer`
     `id`                bigint(20) auto_increment NOT NULL COMMENT 'id',
     `url`               varchar(1024)             NOT NULL COMMENT 'offer自身网址',
     `title`             varchar(600)              NOT NULL DEFAULT '' COMMENT 'offer标题',
-    `payout`            varchar(100)               NOT NULL DEFAULT '' COMMENT '酬金',
+    `payout`            varchar(100)              NOT NULL DEFAULT '' COMMENT '酬金',
     `offer_create_time` varchar(32)               NOT NULL DEFAULT 0 COMMENT 'offer创建时间',
     `offer_update_time` varchar(32)               NOT NULL DEFAULT '' COMMENT 'offer更新时间',
     `category`          varchar(256)              NOT NULL DEFAULT '' COMMENT 'offer类别',
     `geo`               VARCHAR(2048)             NOT NULL DEFAULT '' COMMENT '国家地区',
     `network`           VARCHAR(256)              NOT NULL DEFAULT '' COMMENT '营销网络',
-    `description`       mediumtext            NOT NULL DEFAULT '' COMMENT 'offer描述',
+    `description`       mediumtext                NOT NULL DEFAULT '' COMMENT 'offer描述',
     `land_page`         VARCHAR(1024)             NOT NULL DEFAULT '' COMMENT '落地页链接',
     `land_page_img`     VARCHAR(256)              NOT NULL DEFAULT '' COMMENT '落地页图片',
     `create_time`       bigint(20)                NOT NULL DEFAULT 0 COMMENT '数据创建时间',
@@ -65,10 +65,10 @@ CREATE TABLE IF NOT EXISTS `odigger_offer`
 
 CREATE TABLE IF NOT EXISTS `affiliate_network`
 (
-    `id`                bigint(20) auto_increment NOT NULL COMMENT 'id',
-    `name`              varchar(255)              NOT NULL COMMENT 'name',
-    `url`               varchar(1024)             NOT NULL COMMENT 'affiliate network website',
-    `domain`            varchar(255)              NOT NULL COMMENT 'domain',
+    `id`     bigint(20) auto_increment NOT NULL COMMENT 'id',
+    `name`   varchar(255)              NOT NULL COMMENT 'name',
+    `url`    varchar(1024)             NOT NULL COMMENT 'affiliate network website',
+    `domain` varchar(255)              NOT NULL COMMENT 'domain',
 
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
