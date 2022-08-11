@@ -195,6 +195,8 @@ if __name__ == '__main__':
         browser.get(url)
         main_handle = browser.current_window_handle
         offer_links = browser.find_elements_by_css_selector('h2.mb-1 a')
+        if not offer_links:
+            break
         for offer_link in offer_links:
             link = offer_link.get_attribute('href')
             # 检查是否已经爬取过这个offer了
@@ -209,7 +211,5 @@ if __name__ == '__main__':
             get_offer(link, browser, session)
             browser.close()
             browser.switch_to.window(main_handle)
-            # break  # for test
-        # break  # for test
     browser.quit()
     session.close()
