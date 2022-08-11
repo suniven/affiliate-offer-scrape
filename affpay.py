@@ -196,6 +196,7 @@ if __name__ == '__main__':
         main_handle = browser.current_window_handle
         offer_links = browser.find_elements_by_css_selector('h2.mb-1 a')
         if not offer_links:
+            print("爬取完毕")
             break
         for offer_link in offer_links:
             link = offer_link.get_attribute('href')
