@@ -68,7 +68,7 @@ class Odigger_Offer(Base):
 
 class Affiliate_Network(Base):
     # 表名
-    __tablename__ = 'odigger_offer'
+    __tablename__ = 'affiliate_network'
 
     id = Column(mysql.BIGINT, primary_key=True)
     name = Column(String(255))
