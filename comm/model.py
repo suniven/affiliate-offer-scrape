@@ -64,3 +64,13 @@ class Odigger_Offer(Base):
     land_page_img = Column(String(256))
     status = Column(String(24))
     create_time = Column(mysql.BIGINT)
+
+
+class Affiliate_Network(Base):
+    # 表名
+    __tablename__ = 'affiliate_network'
+
+    id = Column(mysql.BIGINT, primary_key=True)
+    name = Column(String(255))
+    url = Column(String(1024))
+    domain = Column(String(255))

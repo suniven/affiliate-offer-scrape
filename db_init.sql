@@ -62,6 +62,20 @@ CREATE TABLE IF NOT EXISTS `odigger_offer`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8 COMMENT ='odigger offer';
 
+
+CREATE TABLE IF NOT EXISTS `affiliate_network`
+(
+    `id`                bigint(20) auto_increment NOT NULL COMMENT 'id',
+    `name`              varchar(255)              NOT NULL COMMENT 'name',
+    `url`               varchar(1024)             NOT NULL COMMENT 'affiliate network website',
+    `domain`            varchar(255)              NOT NULL COMMENT 'domain',
+
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8 COMMENT ='affiliate_network';
+
+alter table affiliate_network
+    convert to character set utf8mb4;
 alter table affpay_offer
     convert to character set utf8mb4;
 alter table offervault_offer
