@@ -12,7 +12,6 @@ CREATE TABLE IF NOT EXISTS `affpay_offer`
     `network`           VARCHAR(100)              NOT NULL DEFAULT '' COMMENT '营销网络',
     `description`       mediumtext                NOT NULL DEFAULT '' COMMENT 'offer描述',
     `land_page`         VARCHAR(1024)             NOT NULL DEFAULT '' COMMENT '落地页链接',
-    `land_page_img`     VARCHAR(256)              NOT NULL DEFAULT '' COMMENT '落地页图片',
     `create_time`       bigint(20)                NOT NULL DEFAULT 0 COMMENT '数据创建时间',
 
     PRIMARY KEY (`id`)
@@ -33,7 +32,6 @@ CREATE TABLE IF NOT EXISTS `offervault_offer`
     `network`           VARCHAR(256)              NOT NULL DEFAULT '' COMMENT '营销网络',
     `description`       mediumtext                NOT NULL DEFAULT '' COMMENT 'offer描述',
     `land_page`         VARCHAR(1024)             NOT NULL DEFAULT '' COMMENT '落地页链接',
-    `land_page_img`     VARCHAR(256)              NOT NULL DEFAULT '' COMMENT '落地页图片',
     `create_time`       bigint(20)                NOT NULL DEFAULT 0 COMMENT '数据创建时间',
 
     PRIMARY KEY (`id`)
@@ -55,7 +53,6 @@ CREATE TABLE IF NOT EXISTS `odigger_offer`
     `network`           VARCHAR(256)              NOT NULL DEFAULT '' COMMENT '营销网络',
     `description`       VARCHAR(10000)            NOT NULL DEFAULT '' COMMENT 'offer描述',
     `land_page`         VARCHAR(1024)             NOT NULL DEFAULT '' COMMENT '落地页链接',
-    `land_page_img`     VARCHAR(256)              NOT NULL DEFAULT '' COMMENT '落地页图片',
     `create_time`       bigint(20)                NOT NULL DEFAULT 0 COMMENT '数据创建时间',
 
     PRIMARY KEY (`id`)
