@@ -55,7 +55,6 @@ def get_offer(browser, session, offer_link):
     offervault_offer.offer_update_time = ''
     offervault_offer.geo = ''
     offervault_offer.description = ''
-    offervault_offer.land_page_img = ''
     offervault_offer.land_page = ''
 
     preview_url = ''

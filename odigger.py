@@ -52,7 +52,6 @@ def get_offer(browser, offer_link, session):
     odigger_offer.title = ''
     odigger_offer.url = offer_link
     odigger_offer.category = ''
-    odigger_offer.land_page_img = ''
     odigger_offer.land_page = ''
     odigger_offer.geo = ''
     odigger_offer.offer_update_time = ''

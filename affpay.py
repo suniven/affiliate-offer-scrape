@@ -116,7 +116,6 @@ def get_offer(offer_link, browser, session):
     except Exception as err:
         print("Error: ", err)
 
-    affpay_offer.land_page_img = ''
     affpay_offer.land_page = ''
     try:
         browser.find_element_by_xpath('//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[2]/div[1]').click()
