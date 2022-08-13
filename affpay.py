@@ -132,7 +132,7 @@ def get_offer(offer_link, browser, session):
     except Exception as err:
         print("Getting Preview Landing Page Error: ", err)
 
-    # description 麻烦死了
+    # description
     affpay_offer.description = ''
     try:
         show_more_btn = browser.find_element_by_xpath(
@@ -159,7 +159,6 @@ def get_offer(offer_link, browser, session):
     print("offer update time: ", affpay_offer.offer_update_time)
     print("offer description: ", affpay_offer.description)
     print("offer land page: ", affpay_offer.land_page)
-    print("offer land page img: ", affpay_offer.land_page_img)
     print("offer category: ", affpay_offer.category)
     print("offer geo: ", affpay_offer.geo)
     print("offer network: ", affpay_offer.network)
