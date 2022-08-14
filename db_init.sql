@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS `affpay_offer`
     `category`          varchar(1000)             NOT NULL DEFAULT '' COMMENT 'offer类别',
     `geo`               VARCHAR(2048)             NOT NULL DEFAULT '' COMMENT '国家地区',
     `network`           VARCHAR(100)              NOT NULL DEFAULT '' COMMENT '营销网络',
-    `description`       mediumtext                NOT NULL DEFAULT '' COMMENT 'offer描述',
+    `description`       mediumtext                NOT NULL COMMENT 'offer描述',
     `land_page`         VARCHAR(1024)             NOT NULL DEFAULT '' COMMENT '落地页链接',
     `create_time`       bigint(20)                NOT NULL DEFAULT 0 COMMENT '数据创建时间',
 
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `offervault_offer`
     `category`          varchar(256)              NOT NULL DEFAULT '' COMMENT 'offer类别',
     `geo`               VARCHAR(2048)             NOT NULL DEFAULT '' COMMENT '国家地区',
     `network`           VARCHAR(256)              NOT NULL DEFAULT '' COMMENT '营销网络',
-    `description`       mediumtext                NOT NULL DEFAULT '' COMMENT 'offer描述',
+    `description`       mediumtext                NOT NULL COMMENT 'offer描述',
     `land_page`         VARCHAR(1024)             NOT NULL DEFAULT '' COMMENT '落地页链接',
     `create_time`       bigint(20)                NOT NULL DEFAULT 0 COMMENT '数据创建时间',
 
