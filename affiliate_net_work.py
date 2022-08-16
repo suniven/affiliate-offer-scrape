@@ -21,11 +21,11 @@ def offervault(browser, session):
     total_page = 17
     url_prefix = 'https://offervault.com/networks/?search=&page='
     for page in range(1, total_page + 1):
+        url = url_prefix + str(page)
+        browser.get(url)
+        print("---Current Page: {0} ---".format(page))
+        main_handle = browser.current_window_handle
         try:
-            url = url_prefix + str(page)
-            browser.get(url)
-            print("---Current Page: {0} ---".format(page))
-            main_handle = browser.current_window_handle
             # no.1
             table = browser.find_element_by_css_selector('#offertable > tbody')
             trs = table.find_elements_by_tag_name('tr')
@@ -44,13 +44,17 @@ def offervault(browser, session):
                 rows = session.query(Affiliate_Network).filter(
                     Affiliate_Network.name.like(affiliate_network_name)).all()
                 if rows:
+                    browser.close()
+                    browser.switch_to.window(main_handle)
                     print("已经爬取过")
                     continue
 
                 # click JOIN button
+                time.sleep(3)
                 browser.find_element_by_css_selector(
                     '#__layout > div > section > div > div.contentspacer > div > div:nth-child(1) > div > div > div > div > div > div > div:nth-child(1) > a.offerdesc'
                 ).click()
+                print("successfully click")
                 handles = browser.window_handles
                 browser.switch_to.window(handles[2])  # 切换标签页
                 affiliate_network_url = browser.current_url
@@ -69,7 +73,11 @@ def offervault(browser, session):
                 browser.switch_to.window(handles[1])
                 browser.close()
                 browser.switch_to.window(main_handle)
+        except Exception as error:
+            print(error)
+        try:
             # no.2
+            print("Part 2.")
             table = browser.find_element_by_css_selector('#index-page-networkstable > tbody')
             trs = table.find_elements_by_tag_name('tr')
             for tr in trs:
@@ -87,13 +95,17 @@ def offervault(browser, session):
                 rows = session.query(Affiliate_Network).filter(
                     Affiliate_Network.name.like(affiliate_network_name)).all()
                 if rows:
+                    browser.close()
+                    browser.switch_to.window(main_handle)
                     print("已经爬取过")
                     continue
 
                 # click JOIN button
+                time.sleep(3)  # 确保点到
                 browser.find_element_by_css_selector(
                     '#__layout > div > section > div > div.contentspacer > div > div:nth-child(1) > div > div > div > div > div > div > div:nth-child(1) > a.offerdesc'
                 ).click()
+                print("successfully click")
                 handles = browser.window_handles
                 browser.switch_to.window(handles[2])  # 切换标签页
                 affiliate_network_url = browser.current_url
@@ -112,9 +124,8 @@ def offervault(browser, session):
                 browser.switch_to.window(handles[1])
                 browser.close()
                 browser.switch_to.window(main_handle)
-        except Exception as err:
-            print("Error: ", err)
-            continue
+        except Exception as error:
+            print(error)
 
 
 def odigger(browser, session):
@@ -126,10 +137,9 @@ def odigger(browser, session):
             browser.get(url)
             print("Page: ", page)
             main_handle = browser.current_window_handle
-            trs = browser.find_elements_by_css_selector('table#networks-table> tbody > tr')
-            for tr in trs:
-                tds = tr.find_elements_by_tag_name('td')
-                affiliate_network_name = tds[2].find_element_by_tag_name('a').text
+            links = browser.find_elements_by_css_selector('table#networks-table> tbody > tr > td > span >h1 > a')
+            for link in links:
+                affiliate_network_name = link.text
                 print("affiliate_network_name: ", affiliate_network_name)
                 # 看之前是否已经爬取过
                 rows = session.query(Affiliate_Network).filter(
@@ -138,7 +148,7 @@ def odigger(browser, session):
                     print("已经爬取过")
                     continue
 
-                link = tds[2].find_element_by_tag_name('a').get_attribute('href')
+                link = link.get_attribute('href')
                 js = 'window.open(\"' + link + '\");'
                 browser.execute_script(js)
                 handles = browser.window_handles
@@ -225,12 +235,12 @@ def main():
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
 
-    # # offervault:
-    # offervault(browser, session)
-    # # odigger:
+    # offervault:
+    offervault(browser, session)
+    # # odigger 爬完了
     # odigger(browser, session)
-    # affpay 爬完了
-    affpay(browser, session)
+    # # affpay 爬完了
+    # affpay(browser, session)
 
     browser.close()
     browser.quit()
