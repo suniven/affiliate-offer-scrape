@@ -119,7 +119,6 @@ def get_offer(browser, offer_link, session):
     print("offer payout: ", odigger_offer.payout)
     print("offer geo: ", odigger_offer.geo)
     print("offer description: ", odigger_offer.description)
-    print("offer landing page img: ", odigger_offer.land_page_img)
 
     odigger_offer.create_time = get_now_timestamp()
 

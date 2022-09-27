@@ -18,11 +18,16 @@ from comm.config import sqlconn
 
 # 共77种category
 category_list = [
-    "Mobile", "CPL", "SOI", "Sweepstake", "Incent", "Android", "Dating", "Nutra", "Crypto", "Ecommerce", "iOS", "CPS", "BizOpp", "Shopping", "Forex",
-    "Health", "Game", "CPI", "Adult", "Finance", "Entertainment", "Pin", "Gambling", "App", "Email", "DOI", "Download", "Casino", "Survey", "Job",
-    "Subscription", "COD", "Desktop", "CPE", "Diet", "RevShare", "Freebie", "Software", "Beauty", "Insurance", "Coupon", "Leadgen", "Utility",
-    "Trial", "Mainstream", "PPS", "Home", "CPR", "Service", "Auto", "VOD", "Fitness", "PPL", "Betting", "Sport", "Travel", "LifeStyle", "Business",
-    "Install", "Smartlink", "Loan", "Credit", "Education", "Cam", "Solar", "CPC", "CBD", "Streaming", "Binary", "Payday", "Real Estate",
+    "Mobile", "CPL", "SOI", "Sweepstake", "Incent", "Android", "Dating", "Nutra", "Crypto", "Ecommerce", "iOS", "CPS",
+    "BizOpp", "Shopping", "Forex",
+    "Health", "Game", "CPI", "Adult", "Finance", "Entertainment", "Pin", "Gambling", "App", "Email", "DOI", "Download",
+    "Casino", "Survey", "Job",
+    "Subscription", "COD", "Desktop", "CPE", "Diet", "RevShare", "Freebie", "Software", "Beauty", "Insurance", "Coupon",
+    "Leadgen", "Utility",
+    "Trial", "Mainstream", "PPS", "Home", "CPR", "Service", "Auto", "VOD", "Fitness", "PPL", "Betting", "Sport",
+    "Travel", "LifeStyle", "Business",
+    "Install", "Smartlink", "Loan", "Credit", "Education", "Cam", "Solar", "CPC", "CBD", "Streaming", "Binary",
+    "Payday", "Real Estate",
     "Pay Per Call", "Astrology", "Music", "Legal", "KPI", "Auctions"
 ]
 
@@ -32,7 +37,8 @@ category_list = [
 START_PAGE = 1
 END_PAGE = 200
 PAGE_COUNT = 200
-headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'}
+headers = {
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'}
 proxy = '127.0.0.1:1080'
 proxies = {'http': 'http://' + proxy, 'https': 'http://' + proxy}
 
@@ -67,7 +73,8 @@ def get_offer(offer_link, browser, session):
     try:
         affpay_offer.title = browser.find_element_by_css_selector('h1.richtext').text
         # print("title: ", affpay_offer.title)
-        container = browser.find_element_by_xpath('//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[1]/div')
+        container = browser.find_element_by_xpath(
+            '//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[1]/div')
         spans = container.find_elements_by_tag_name('span')
         affpay_offer.status = spans[0].text
         # print("status: ", affpay_offer.status)
@@ -86,7 +93,8 @@ def get_offer(offer_link, browser, session):
         affpay_offer.payout = ''
         affpay_offer.category = ''
         affpay_offer.geo = ''
-        divs = browser.find_elements_by_xpath('//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[2]/div[2]/div')
+        divs = browser.find_elements_by_xpath(
+            '//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[2]/div[2]/div')
         for div in divs:
             spans = div.find_elements_by_tag_name('span')
             if spans[0].text == 'PAYOUT':
@@ -117,20 +125,21 @@ def get_offer(offer_link, browser, session):
         print("Error: ", err)
 
     affpay_offer.land_page = ''
-    try:
-        browser.find_element_by_xpath('//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[2]/div[1]').click()
-
-        handles = browser.window_handles
-        browser.switch_to.window(handles[2])
-        if 'The Geek Gaming Smartlink' in affpay_offer.title:  # 先这样吧懒得管了
-            affpay_offer.land_page = 'about:blank'
-        else:
-            affpay_offer.land_page = browser.current_url
-
-        browser.close()
-        browser.switch_to.window(handles[1])
-    except Exception as err:
-        print("Getting Preview Landing Page Error: ", err)
+    # try:
+    #     browser.find_element_by_xpath(
+    #         '//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[2]/div[1]').click()
+    #
+    #     handles = browser.window_handles
+    #     browser.switch_to.window(handles[2])
+    #     if 'The Geek Gaming Smartlink' in affpay_offer.title:  # 先这样吧懒得管了
+    #         affpay_offer.land_page = 'about:blank'
+    #     else:
+    #         affpay_offer.land_page = browser.current_url
+    #
+    #     browser.close()
+    #     browser.switch_to.window(handles[1])
+    # except Exception as err:
+    #     print("Getting Preview Landing Page Error: ", err)
 
     # description
     affpay_offer.description = ''
@@ -142,9 +151,10 @@ def get_offer(offer_link, browser, session):
         print("No Show More Btn.")
         # print("Error Detail: ", err)
     try:
-        # 情况太多，直接处理html算了
+        # 情况太多，直接处理html
         description = browser.find_element_by_xpath(
-            '//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[3]/div').get_attribute('innerHTML')
+            '//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[3]/div').get_attribute(
+            'innerHTML')
         soup = BeautifulSoup(description, "lxml")
         description = soup.get_text()
         affpay_offer.description = description
@@ -183,32 +193,34 @@ if __name__ == '__main__':
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
 
-    category = category_list[int(sys.argv[1])]
-    url_prefix = 'https://www.affplus.com/search?verticals=' + category + '&page='
+    # category = category_list[int(sys.argv[1])]
+    for category in category_list:
+        print("---Category: {0}---".format(category))
+        url_prefix = 'https://www.affplus.com/search?verticals=' + category + '&page='
 
-    for i in range(START_PAGE, END_PAGE + 1):
-        print("--------------------")
-        print("Getting Page {0}...".format(i))
-        url = url_prefix + str(i)
-        browser.get(url)
-        main_handle = browser.current_window_handle
-        offer_links = browser.find_elements_by_css_selector('h2.mb-1 a')
-        if not offer_links:
-            print("爬取完毕")
-            break
-        for offer_link in offer_links:
-            link = offer_link.get_attribute('href')
-            # 检查是否已经爬取过这个offer了
-            rows = session.query(Affpay_Offer).filter(Affpay_Offer.url.like(link)).all()
-            if rows:
-                print("Offer {0} Has Already Been Visited.".format(link))
-                continue
-            # 弹窗处理测试
-            # link = 'https://www.affplus.com/o/iluvo-de-de-ch-at-non-incent-cpl-mobile-2'
-            # 折叠geo获取测试
-            # link = 'https://www.affplus.com/o/sweetsext-au-ca-dk-ie-nz-no-gb-us-cpl-for-adult-dating-content-18-women-date-sex-sexy-tinder-flirt'
-            get_offer(link, browser, session)
-            browser.close()
-            browser.switch_to.window(main_handle)
+        for i in range(START_PAGE, END_PAGE + 1):
+            print("--------------------")
+            print("Getting Page {0}...".format(i))
+            url = url_prefix + str(i)
+            browser.get(url)
+            main_handle = browser.current_window_handle
+            offer_links = browser.find_elements_by_css_selector('h2.mb-1 a')
+            if not offer_links:
+                print("爬取完毕")
+                break
+            for offer_link in offer_links:
+                link = offer_link.get_attribute('href')
+                # 检查是否已经爬取过这个offer了
+                rows = session.query(Affpay_Offer).filter(Affpay_Offer.url.like(link)).all()
+                if rows:
+                    print("Offer {0} Has Already Been Visited.".format(link))
+                    continue
+                try:
+                    get_offer(link, browser, session)
+                except Exception as err:
+                    print(err)
+                finally:
+                    browser.close()
+                    browser.switch_to.window(main_handle)
     browser.quit()
     session.close()
