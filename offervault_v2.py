@@ -19,7 +19,7 @@ url = 'https://offervault.com/?selectedTab=topOffers&search=&page=1'
 PAGE_COUNT = 250
 headers = {
     'user-agent':
-    'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'
+        'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'
 }
 proxy = '127.0.0.1:1080'
 proxies = {'http': 'http://' + proxy, 'https': 'http://' + proxy}
@@ -153,72 +153,74 @@ def get_next_page(browser, retry, next_page_xpath):
 
 
 if __name__ == '__main__':
-    # # 正常模式
-    # browser = webdriver.Chrome()
-    # browser.maximize_window()
-    # headless模式
-    option = webdriver.ChromeOptions()
-    option.add_argument('--headless')
-    option.add_argument("--window-size=1920,1080")
-    browser = webdriver.Chrome(chrome_options=option)
     engine = create_engine(sqlconn, echo=True, max_overflow=16)
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
-    selected_index = sys.argv[1]
-    tag_xpath = '//*[@id="__layout"]/div/section[1]/div[1]/div/div[1]/div[1]/div/div[1]/ul/li[3]/div/div[3]/ul/li[' + selected_index + ']'
-    try:
-        # 选择分类
-        browser.get(url)
+    for selected_index in range(1, 70):
+        print("Current selected index: ", selected_index)
+        # # 正常模式
+        # browser = webdriver.Chrome()
+        # browser.maximize_window()
+        # headless模式
+        option = webdriver.ChromeOptions()
+        option.add_argument('--headless')
+        option.add_argument("--window-size=1920,1080")
+        browser = webdriver.Chrome(chrome_options=option)
         browser.implicitly_wait(3)
-        multi_select = browser.find_element_by_xpath(
-            '//*[@id="__layout"]/div/section[1]/div[1]/div/div[1]/div[1]/div/div[1]/ul/li[3]/div/div[1]')
-        ActionChains(browser).move_to_element(multi_select).click().perform()  # **必须要模拟鼠标悬浮否则没反应
-        browser.find_element_by_xpath(tag_xpath).click()
-        time.sleep(2)
+        # selected_index = sys.argv[1]
+        tag_xpath = '//*[@id="__layout"]/div/section[1]/div[1]/div/div[1]/div[1]/div/div[1]/ul/li[3]/div/div[3]/ul/li[' + str(selected_index) + ']'
+        try:
+            # 选择分类
+            browser.get(url)
+            multi_select = browser.find_element_by_xpath(
+                '//*[@id="__layout"]/div/section[1]/div[1]/div/div[1]/div[1]/div/div[1]/ul/li[3]/div/div[1]')
+            ActionChains(browser).move_to_element(multi_select).click().perform()  # **必须要模拟鼠标悬浮否则没反应
+            browser.find_element_by_xpath(tag_xpath).click()
+            time.sleep(2)
 
-        while True:
-            main_handle = browser.current_window_handle
-            url = browser.current_url
-            page = re.findall(r'page=[0-9]+', url)[0][5:]
-            print("-------Current Page: {0}-------".format(page))
-            # 获取当前页offer链接
-            container = browser.find_element_by_css_selector('#index-page-offerstable > tbody')
-            links = container.find_elements_by_tag_name('a')
-            for link in links:
-                offer_link = link.get_attribute('href')
-                # 过滤 javascript:;
-                if offer_link == 'javascript:;':
-                    continue
-                # 检查是否已经爬取过这个offer了
-                rows = session.query(Offervault_Offer).filter(Offervault_Offer.url.like(offer_link)).all()
-                if rows:
-                    print("*** Offer {0} Has Already Been Visited. ***".format(offer_link))
-                    continue
-                # # 折叠countries测试
-                # offer_link = 'https://offervault.com/offer/b2cdfbacede6f41df8017045d803b1df/badoink-vod-nz-au-ca-gb-us'
-                get_offer(browser, session, offer_link)
-                browser.close()
-                browser.switch_to.window(main_handle)
-                time.sleep(1)
-            #     break  # for test
-            # break  # for test
+            while True:
+                main_handle = browser.current_window_handle
+                url = browser.current_url
+                page = re.findall(r'page=[0-9]+', url)[0][5:]
+                print("-------Current Page: {0}-------".format(page))
+                # 获取当前页offer链接
+                container = browser.find_element_by_css_selector('#index-page-offerstable > tbody')
+                links = container.find_elements_by_tag_name('a')
+                for link in links:
+                    offer_link = link.get_attribute('href')
+                    # 过滤 javascript:;
+                    if offer_link == 'javascript:;':
+                        continue
+                    # 检查是否已经爬取过这个offer了
+                    rows = session.query(Offervault_Offer).filter(Offervault_Offer.url.like(offer_link)).all()
+                    if rows:
+                        print("*** Offer {0} Has Already Been Visited. ***".format(offer_link))
+                        continue
+                    # # 折叠countries测试
+                    # offer_link = 'https://offervault.com/offer/b2cdfbacede6f41df8017045d803b1df/badoink-vod-nz-au-ca-gb-us'
+                    get_offer(browser, session, offer_link)
+                    browser.close()
+                    browser.switch_to.window(main_handle)
+                    time.sleep(1)
+                #     break  # for test
+                # break  # for test
 
-            # 判断是否还有下一页
-            btn_count = len(
-                browser.find_elements_by_css_selector(
-                    '#__layout > div > section:nth-child(3) > div > div > div > div.col-md-9 > div.tablecont > div > div > div.paginrow > ul > li'
-                ))
-            next_page_index = btn_count - 1
-            next_page_xpath = '//*[@id="__layout"]/div/section[2]/div/div/div/div[1]/div[1]/div/div/div[2]/ul/li[' + str(
-                next_page_index) + ']/button'
-            if not check_if_exist(browser, next_page_xpath, 'xpath'):
-                break
-            else:
-                # 跳转到下一页
-                get_next_page(browser, 0, next_page_xpath)
+                # 判断是否还有下一页
+                btn_count = len(
+                    browser.find_elements_by_css_selector(
+                        '#__layout > div > section:nth-child(3) > div > div > div > div.col-md-9 > div.tablecont > div > div > div.paginrow > ul > li'
+                    ))
+                next_page_index = btn_count - 1
+                next_page_xpath = '//*[@id="__layout"]/div/section[2]/div/div/div/div[1]/div[1]/div/div/div[2]/ul/li[' + str(
+                    next_page_index) + ']/button'
+                if not check_if_exist(browser, next_page_xpath, 'xpath'):
+                    break
+                else:
+                    # 跳转到下一页
+                    get_next_page(browser, 0, next_page_xpath)
 
-    except Exception as err:
-        print(err)
-    finally:
-        browser.quit()
-        session.close()
+        except Exception as err:
+            print(err)
+        finally:
+            browser.quit()
+    session.close()
