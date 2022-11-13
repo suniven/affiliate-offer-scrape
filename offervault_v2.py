@@ -15,7 +15,7 @@ from comm.timestamp import get_now_timestamp
 from comm.model import Offervault_Offer
 from comm.config import sqlconn
 
-url = 'https://offervault.com/?selectedTab=topOffers&search=&page=1'
+
 PAGE_COUNT = 250
 headers = {
     'user-agent':
@@ -23,6 +23,15 @@ headers = {
 }
 proxy = '127.0.0.1:1080'
 proxies = {'http': 'http://' + proxy, 'https': 'http://' + proxy}
+
+keywords_list = ['Accessories', 'Addiction', 'Adult', 'App', 'Beauty', 'Betting', 'Billing', 'Biz Opp', 'Cams',
+                 'Casino', 'CBD', 'CC Submit', 'Clothing', 'Coupons', 'CPA', 'CPI', 'CPL', 'CPM', 'Credit', 'Crypto',
+                 'Dating', 'Debt', 'Desktop', 'Diet', 'Display', 'Downloads', 'eCommerce', 'Education', 'Email',
+                 'Email Submit', 'Entertainment', 'Facebook', 'Fashion', 'Financial', 'Forex', 'Free Trial', 'Gambling',
+                 'Gaming', 'Health', 'Home Services', 'Install', 'Insurance', 'International', 'Investment', 'Lead Gen',
+                 'Legal', 'Loan', 'Mainstream', 'Make Money', 'Mobile', 'Music', 'Nutra', 'Pay Per Call', 'Recovery',
+                 'Rehab', 'Search', 'SEO', 'Shopping', 'Smartlink', 'Social Media', 'Software', 'Sports', 'Streaming',
+                 'Survey', 'Sweepstakes', 'Tech', 'Travel', 'VOD', 'Weight Loss']
 
 
 def check_if_exist(browser, element, condition):
@@ -133,8 +142,8 @@ def get_offer(browser, session, offer_link):
     print("offer category: ", offervault_offer.category)
     print("offer landing page: ", offervault_offer.land_page)
 
-    session.add(offervault_offer)
-    session.commit()
+    # session.add(offervault_offer)
+    # session.commit()
 
 
 def get_next_page(browser, retry, next_page_xpath):
@@ -156,8 +165,8 @@ if __name__ == '__main__':
     engine = create_engine(sqlconn, echo=True, max_overflow=16)
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
-    for selected_index in range(1, 70):
-        print("Current selected index: ", selected_index)
+    for keyword in keywords_list:
+        print("Current: ", keyword)
         # # 正常模式
         # browser = webdriver.Chrome()
         # browser.maximize_window()
@@ -167,15 +176,9 @@ if __name__ == '__main__':
         option.add_argument("--window-size=1920,1080")
         browser = webdriver.Chrome(chrome_options=option)
         browser.implicitly_wait(3)
-        # selected_index = sys.argv[1]
-        tag_xpath = '//*[@id="__layout"]/div/section[1]/div[1]/div/div[1]/div[1]/div/div[1]/ul/li[3]/div/div[3]/ul/li[' + str(selected_index) + ']'
         try:
-            # 选择分类
+            url = 'https://offervault.com/?selectedTab=topOffers&search=' + keyword + '&page=1'
             browser.get(url)
-            multi_select = browser.find_element_by_xpath(
-                '//*[@id="__layout"]/div/section[1]/div[1]/div/div[1]/div[1]/div/div[1]/ul/li[3]/div/div[1]')
-            ActionChains(browser).move_to_element(multi_select).click().perform()  # **必须要模拟鼠标悬浮否则没反应
-            browser.find_element_by_xpath(tag_xpath).click()
             time.sleep(2)
 
             while True:
@@ -223,4 +226,5 @@ if __name__ == '__main__':
             print(err)
         finally:
             browser.quit()
+            break  # for test
     session.close()
