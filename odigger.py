@@ -52,6 +52,7 @@ def get_offer(browser, offer_link, session):
     odigger_offer.title = ''
     odigger_offer.url = offer_link
     odigger_offer.category = ''
+    odigger_offer.custom_cate = ''
     odigger_offer.land_page = ''
     odigger_offer.geo = ''
     odigger_offer.offer_update_time = ''
@@ -138,6 +139,8 @@ if __name__ == '__main__':
     option = webdriver.ChromeOptions()
     option.add_argument('--headless')
     option.add_argument("--window-size=1920,1080")
+    option.add_argument('--no-proxy-server')
+
     browser = webdriver.Chrome(chrome_options=option)
     engine = create_engine(sqlconn, echo=True, max_overflow=8)
     DBSession = sessionmaker(bind=engine)
@@ -149,7 +152,6 @@ if __name__ == '__main__':
             url = url_prefix + str(page)
             browser.get(url)
             time.sleep(4)
-            # 这网站太拉了 加载不出来就刷新
             refresh_time = MAX_REFRESH_TIME
             while refresh_time:
                 if check_if_exist(browser, '#search-page-offers-table > tbody > tr', 'css'):

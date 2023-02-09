@@ -1,1 +1,1 @@
-sqlconn = 'mysql+pymysql://root:1101syw@localhost:3306/youtube_twitter_url?charset=utf8mb4'
+sqlconn = 'mysql+pymysql://root:123456@localhost:3306/affiliate_offers?charset=utf8mb4'

@@ -1,6 +1,7 @@
 import re
 import sys
 import time
+import random
 from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.support import expected_conditions as EC
@@ -61,29 +62,47 @@ def get_offer(offer_link, browser, session):
     print("Visiting Offer: ", offer_link)
     js = 'window.open(\"' + offer_link + '\");'
     browser.execute_script(js)
-    time.sleep(3)
+    time.sleep(4)
     handles = browser.window_handles
     browser.switch_to.window(handles[1])  # 切换标签页
     affpay_offer = Affpay_Offer()
     affpay_offer.url = offer_link
     affpay_offer.title = ''
     affpay_offer.status = ''
+    affpay_offer.category = ''
+    affpay_offer.custom_cate = ''
     affpay_offer.offer_create_time = ''
     affpay_offer.offer_update_time = ''
+    load_success = False
+    while not load_success:
+        try:
+            affpay_offer.title = browser.find_element_by_css_selector('h1.richtext').text
+            load_success = True
+            # print("title: ", affpay_offer.title)
+        except Exception as err:
+            print("Get title error: ", err)
+            browser.refresh()
+            time.sleep(5)
+    if not load_success:
+        return
     try:
-        affpay_offer.title = browser.find_element_by_css_selector('h1.richtext').text
-        # print("title: ", affpay_offer.title)
         container = browser.find_element_by_xpath(
             '//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[1]/div')
         spans = container.find_elements_by_tag_name('span')
         affpay_offer.status = spans[0].text
         # print("status: ", affpay_offer.status)
+    except Exception as err:
+        print("Get ststus error: ", err)
+    try:
         affpay_offer.offer_create_time = spans[1].text
         # print("create: ", affpay_offer.offer_create_time)
+    except Exception as err:
+        print("Get create time error: ", err)
+    try:
         affpay_offer.offer_update_time = spans[2].text
         # print("update: ", affpay_offer.offer_update_time)
     except Exception as err:
-        print("Error: ", err)
+        print("Get update time error: ", err)
 
     try:
         affpay_offer.network = browser.find_element_by_xpath(
@@ -97,29 +116,48 @@ def get_offer(offer_link, browser, session):
             '//*[@id="__layout"]/div/div[1]/div[2]/div[2]/div[1]/div/div/div[2]/div[2]/div/div[2]/div[2]/div')
         for div in divs:
             spans = div.find_elements_by_tag_name('span')
-            if spans[0].text == 'PAYOUT':
-                affpay_offer.payout = spans[1].text + '/' + spans[2].text
-                # print("payout: ", affpay_offer.payout)
-            elif spans[0].text == 'CATEGORY':
-                affpay_offer.category = spans[1].text
-                # print("category: ", affpay_offer.category)
-            elif spans[0].text == 'GEO':
-                # geos = []
-                # for span in spans:
-                #     if span.text == 'GEO':
-                #         continue
-                #     else:
-                #         geos.append(span.text)  # 折叠的span.text为空 就离谱
-                # print("geos: ", geos[:])
-                # affpay_offer.geo = ' '.join(geos)
+            # print("len(spans): ", len(spans))
+            if len(spans) == 0:
+                continue
+            try:
+                if spans[0].text == 'PAYOUT':
+                    try:
+                        affpay_offer.payout = spans[1].text + '/' + spans[2].text
+                        # print("payout: ", affpay_offer.payout)
+                    except Exception as err:
+                        # print("payout: ", err)
+                        pass
+                elif spans[0].text == 'CATEGORY':
+                    try:
+                        affpay_offer.category = spans[1].text
+                        # print("category: ", affpay_offer.category)
+                    except Exception as err:
+                        # print("category: ", err)
+                        pass
+                elif spans[0].text == 'GEO':
+                    # geos = []
+                    # for span in spans:
+                    #     if span.text == 'GEO':
+                    #         continue
+                    #     else:
+                    #         geos.append(span.text)  # 折叠的span.text为空 就离谱
+                    # print("geos: ", geos[:])
+                    # affpay_offer.geo = ' '.join(geos)
 
-                # 测试 用soup可以
-                soup = BeautifulSoup(div.get_attribute('innerHTML'), "lxml")
-                geos = soup.get_text()[4:].replace("GEOs", "")
-                geos = " ".join(re.sub(r"[0-9]+", "", geos).split("\n"))
-                geos = " ".join(geos.split())
-                affpay_offer.geo = geos
-                # print("geo: ", affpay_offer.geo)
+                    # 测试 用soup可以
+                    try:
+                        soup = BeautifulSoup(div.get_attribute('innerHTML'), "lxml")
+                        geos = soup.get_text()[4:].replace("GEOs", "")
+                        geos = " ".join(re.sub(r"[0-9]+", "", geos).split("\n"))
+                        geos = " ".join(geos.split())
+                        affpay_offer.geo = geos
+                        # print("geo: ", affpay_offer.geo)
+                    except Exception as err:
+                        # print("geo: ", err)
+                        pass
+            except Exception as err:
+                # print("div in divs: ", err)
+                pass
 
     except Exception as err:
         print("Error: ", err)
@@ -180,29 +218,31 @@ def get_offer(offer_link, browser, session):
 
 
 if __name__ == '__main__':
-    # # 正常模式
-    # browser = webdriver.Chrome()
-    # browser.maximize_window()
-    # headless模式
-    option = webdriver.ChromeOptions()
-    option.add_argument('--headless')
-    option.add_argument("--window-size=1920,1080")
-    browser = webdriver.Chrome(chrome_options=option)
-    browser.implicitly_wait(10)
-    engine = create_engine(sqlconn, echo=True, max_overflow=8)
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-
     # category = category_list[int(sys.argv[1])]
+    random.shuffle(category_list)
     for category in category_list:
+        # # 正常模式
+        # browser = webdriver.Chrome()
+        # browser.maximize_window()
+        # headless模式
+        option = webdriver.ChromeOptions()
+        option.add_argument('--headless')
+        option.add_argument("--window-size=1920,1080")
+        option.add_argument('--no-proxy-server')
+
+        browser = webdriver.Chrome(chrome_options=option)
+        browser.implicitly_wait(10)
+        engine = create_engine(sqlconn, echo=True, max_overflow=8)
+        DBSession = sessionmaker(bind=engine)
+        session = DBSession()
         print("---Category: {0}---".format(category))
         url_prefix = 'https://www.affplus.com/search?verticals=' + category + '&page='
 
         for i in range(START_PAGE, END_PAGE + 1):
-            print("--------------------")
             print("Getting Page {0}...".format(i))
             url = url_prefix + str(i)
             browser.get(url)
+            time.sleep(4)
             main_handle = browser.current_window_handle
             offer_links = browser.find_elements_by_css_selector('h2.mb-1 a')
             if not offer_links:
@@ -222,5 +262,5 @@ if __name__ == '__main__':
                 finally:
                     browser.close()
                     browser.switch_to.window(main_handle)
-    browser.quit()
-    session.close()
+        browser.quit()
+        session.close()

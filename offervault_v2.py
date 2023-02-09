@@ -15,7 +15,6 @@ from comm.timestamp import get_now_timestamp
 from comm.model import Offervault_Offer
 from comm.config import sqlconn
 
-
 PAGE_COUNT = 250
 headers = {
     'user-agent':
@@ -59,6 +58,7 @@ def get_offer(browser, session, offer_link):
     offervault_offer.url = offer_link
     offervault_offer.title = ''
     offervault_offer.payout = ''
+    offervault_offer.category = ''
     offervault_offer.category = ''
     offervault_offer.network = ''
     offervault_offer.offer_update_time = ''
@@ -174,6 +174,7 @@ if __name__ == '__main__':
         option = webdriver.ChromeOptions()
         option.add_argument('--headless')
         option.add_argument("--window-size=1920,1080")
+        option.add_argument('--no-proxy-server')
         browser = webdriver.Chrome(chrome_options=option)
         browser.implicitly_wait(3)
         try:
@@ -226,5 +227,5 @@ if __name__ == '__main__':
             print(err)
         finally:
             browser.quit()
-            break  # for test
+            # break  # for test
     session.close()
