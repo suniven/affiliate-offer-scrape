@@ -59,7 +59,7 @@ def get_offer(browser, session, offer_link):
     offervault_offer.title = ''
     offervault_offer.payout = ''
     offervault_offer.category = ''
-    offervault_offer.category = ''
+    offervault_offer.custom_cate = ''
     offervault_offer.network = ''
     offervault_offer.offer_update_time = ''
     offervault_offer.geo = ''
