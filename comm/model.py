@@ -66,6 +66,26 @@ class Odigger_Offer(Base):
     create_time = Column(mysql.BIGINT)
 
 
+class Affbank_Offer(Base):
+    # 表名
+    __tablename__ = 'affbank_offer'
+
+    id = Column(mysql.BIGINT, primary_key=True)
+    url = Column(String(1024))
+    title = Column(String(600))
+    payout = Column(String(32))
+    offer_create_time = Column(String(32))
+    offer_update_time = Column(String(32))
+    category = Column(String(256))
+    custom_cate = Column(String(100))
+    geo = Column(String(2048))
+    network = Column(String(256))
+    description = Column(String(10000))
+    land_page = Column(String(1024))
+    status = Column(String(24))
+    create_time = Column(mysql.BIGINT)
+
+
 class Affiliate_Network(Base):
     # 表名
     __tablename__ = 'affiliate_network'
