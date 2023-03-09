@@ -99,10 +99,14 @@ alter table offervault_offer
     convert to character set utf8mb4;
 alter table odigger_offer
     convert to character set utf8mb4;
+alter table affbank_offer
+    convert to character set utf8mb4;
 
 alter table affpay_offer
     add column custom_cate varchar(100) not null after category;
 alter table odigger_offer
     add column custom_cate varchar(100) not null after category;
 alter table offervault_offer
+    add column custom_cate varchar(100) not null after category;
+alter table affbank_offer
     add column custom_cate varchar(100) not null after category;

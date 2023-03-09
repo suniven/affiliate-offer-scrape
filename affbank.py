@@ -183,37 +183,36 @@ def main():
     session = DBSession()
 
     url_prefix = "https://affbank.com/offers/"
+    urls = [url_prefix + category for category in categories]
+    urls.append("https://affbank.com/offers?o%5Bca%5D%5B0%5D=47")  # other
     try:
-        for category in categories:
-            print("---Current Category: {0}---".format(category))
-            url = url_prefix + category
+        for url in urls:
             browser.get(url)
             time.sleep(4)
             for i in range(0, 50):  # 最多 50 页
+                tds = browser.find_elements_by_css_selector('td.td-name')
+                main_handle = browser.current_window_handle
+                offer_links = [td.find_element_by_css_selector('a').get_attribute('href') for td in tds]
+                for offer_link in offer_links:
+                    rows = session.query(Affbank_Offer).filter(Affbank_Offer.url.like(offer_link)).all()
+                    if rows:
+                        print("Offer {0} Has Already Been Visited.".format(offer_link))
+                        continue
+                    else:
+                        print("未抓取")
+                    print("Getting Offer {0}".format(offer_link))
+                    get_offer(browser, offer_link, session)
+                    browser.close()
+                    browser.switch_to.window(main_handle)
+                    time.sleep(1)
+                # 下一页
                 try:
-                    tds = browser.find_elements_by_css_selector('td.td-name')
-                    main_handle = browser.current_window_handle
-                    for td in tds:
-                        offer_link = td.find_element_by_css_selector('a').get_attribute('href')
-                        rows = session.query(Affbank_Offer).filter(Affbank_Offer.url.like(offer_link)).all()
-                        if rows:
-                            print("Offer {0} Has Already Been Visited.".format(offer_link))
-                            continue
-
-                        print("Getting Offer {0}".format(offer_link))
-                        get_offer(browser, offer_link, session)
-                        browser.close()
-                        browser.switch_to.window(main_handle)
-                        time.sleep(1)
-                    # 下一页
-                    try:
-                        next_page = browser.find_element_by_css_selector('li.icon-arrow-left')
-                        next_page.click()
-                    except:
-                        pass
+                    next_page = browser.find_element_by_css_selector('li.icon-arrow-left')
+                    next_page.click()
                 except:
+                    print("No next page.")
                     pass
-
+            # break  # test
     except Exception as err:
         print(err)
 
